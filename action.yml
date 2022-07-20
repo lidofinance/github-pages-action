@@ -38,6 +38,7 @@ runs:
           --exclude .git --exclude .github --exclude .ssh --exclude .nojekyll --exclude CNAME \
           ./ &&
         rsync -av --ignore-missing-args /tmp/pages/.nojekyll /tmp/pages/CNAME ./ &&
-        git add -A &&
-        git commit -m 'Update GitHub pages' &&
-        git push --set-upstream origin ${{ inputs.branch }}
+        git add -A;
+        git diff-index --quiet HEAD || 
+          (git commit -m 'Update GitHub pages' &&
+          git push --set-upstream origin ${{ inputs.branch }})
