@@ -41,7 +41,11 @@ runs:
       run: >
         set +euo pipefail;
         rsync -av /tmp/pages/ --delete \
-          --exclude .git --exclude .github --exclude .ssh --exclude .nojekyll --exclude CNAME \
+          --exclude /.git \
+          --exclude /.github \
+          --exclude /.ssh \
+          --exclude /.nojekyll \
+          --exclude /CNAME \
           ./ &&
         rsync -av --ignore-missing-args /tmp/pages/.nojekyll /tmp/pages/CNAME ./ &&
         git add -A;
