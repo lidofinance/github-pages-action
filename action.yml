@@ -19,17 +19,23 @@ runs:
         mkdir /tmp/pages && 
         cp -r ${{ inputs.folder }}/** /tmp/pages
 
-    - name: Checkout target branch
+    - name: Set git config
       shell: bash
       run: >
         git config user.name "GitHub Pages Action" &&
         git config user.email "github-pages-action@github.com"  
+
+    - name: Save commit hash
+      shell: bash
+      id: commit
+      run: echo "::set-output name=hash::$(git rev-parse --short HEAD)"
 
     - name: Checkout target branch
       shell: bash
       run: >
         git switch ${{ inputs.branch }} || 
         git checkout --orphan ${{ inputs.branch }}
+
     - name: Commit pages static files
       shell: bash
       run: >
@@ -40,5 +46,5 @@ runs:
         rsync -av --ignore-missing-args /tmp/pages/.nojekyll /tmp/pages/CNAME ./ &&
         git add -A;
         git diff-index --quiet HEAD || 
-          (git commit -m 'Update GitHub pages' &&
+          (git commit -m 'Update GitHub pages from ${{ steps.commit.outputs.hash }}' &&
           git push --set-upstream origin ${{ inputs.branch }})
