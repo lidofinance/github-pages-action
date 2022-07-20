@@ -1,0 +1,50 @@
+name: 'Publish GitHub pages'
+description: 'Publish static files to branch with GitHub pages'
+inputs:
+  branch:
+    description: 'This is the branch you wish to deploy to, for example gh-pages or docs.'
+    required: false
+    default: gh-pages
+  folder:
+    description: >
+      The folder in your repository that you want to deploy. 
+      If you wish to deploy the root directory you can place a . here.'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Copy files to another directory
+      shell: bash
+      run: >
+        mkdir /tmp/pages && 
+        cp -r ${{ inputs.folder }}/** /tmp/pages
+
+    - name: Set git config
+      shell: bash
+      run: >
+        git config user.name "GitHub Pages Action" &&
+        git config user.email "github-pages-action@github.com"  
+
+    - name: Save commit hash
+      shell: bash
+      id: commit
+      run: echo "::set-output name=hash::$(git rev-parse --short HEAD)"
+
+    - name: Checkout target branch
+      shell: bash
+      run: >
+        git switch ${{ inputs.branch }} || 
+        git checkout --orphan ${{ inputs.branch }}
+
+    - name: Commit pages static files
+      shell: bash
+      run: >
+        set +euo pipefail;
+        rsync -av /tmp/pages/ --delete \
+          --exclude .git --exclude .github --exclude .ssh --exclude .nojekyll --exclude CNAME \
+          ./ &&
+        rsync -av --ignore-missing-args /tmp/pages/.nojekyll /tmp/pages/CNAME ./ &&
+        git add -A;
+        git diff-index --quiet HEAD || 
+          (git commit -m 'Update GitHub pages from ${{ steps.commit.outputs.hash }}' &&
+          git push --set-upstream origin ${{ inputs.branch }})
