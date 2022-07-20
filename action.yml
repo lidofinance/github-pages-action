@@ -17,8 +17,7 @@ runs:
       shell: bash
       run: >
         mkdir /tmp/pages && 
-        cp -r ${{ inputs.folder }}/** /tmp/pages &&
-        ls -la /tmp/pages
+        cp -r ${{ inputs.folder }}/** /tmp/pages
 
     - name: Checkout target branch
       shell: bash
@@ -35,10 +34,10 @@ runs:
       shell: bash
       run: >
         set +euo pipefail;
-        git rm -rf . &&
-        git restore .git .github .ssh .nojekyll CNAME &&
-        ls -la /tmp/pages &&
-        cp -r /tmp/pages/** ./ &&
+        rsync -av /tmp/pages/ --delete \
+          --exclude .git --exclude .github --exclude .ssh --exclude .nojekyll --exclude CNAME \
+          ./ &&
+        rsync -av --ignore-missing-args /tmp/pages/.nojekyll /tmp/pages/CNAME ./ &&
         git add -A &&
         git commit -m 'Update GitHub pages' &&
         git push --set-upstream origin ${{ inputs.branch }}
