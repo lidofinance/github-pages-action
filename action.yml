@@ -40,14 +40,14 @@ runs:
       shell: bash
       run: >
         set +euo pipefail;
-        rsync -av /tmp/pages/ --delete \
+        rsync -cav /tmp/pages/ --delete \
           --exclude /.git \
           --exclude /.github \
           --exclude /.ssh \
           --exclude /.nojekyll \
           --exclude /CNAME \
           ./ &&
-        rsync -av --ignore-missing-args /tmp/pages/.nojekyll /tmp/pages/CNAME ./ &&
+        rsync -cav --ignore-missing-args /tmp/pages/.nojekyll /tmp/pages/CNAME ./ &&
         git add -A;
         git diff-index --quiet HEAD || 
           (git commit -m 'Update GitHub pages from ${{ steps.commit.outputs.hash }}' &&
