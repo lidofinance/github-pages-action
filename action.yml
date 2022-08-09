@@ -33,6 +33,7 @@ runs:
     - name: Checkout target branch
       shell: bash
       run: >
+        git reset --hard HEAD;
         git switch ${{ inputs.branch }} || 
         git checkout --orphan ${{ inputs.branch }}
 
