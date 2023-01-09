@@ -52,4 +52,4 @@ runs:
         git add -A;
         git diff-index --quiet HEAD || 
           (git commit -m 'Update GitHub pages from ${{ steps.commit.outputs.hash }}' &&
-          git push --set-upstream origin ${{ inputs.branch }})
+          git push https://x-access-token:${{ github.token }}@github.com/${{ github.repository }} ${{ inputs.branch }})
