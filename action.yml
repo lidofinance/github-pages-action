@@ -28,7 +28,7 @@ runs:
     - name: Save commit hash
       shell: bash
       id: commit
-      run: echo "::set-output name=hash::$(git rev-parse --short HEAD)"
+      run: echo "hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
     - name: Checkout target branch
       shell: bash
